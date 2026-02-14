@@ -1,46 +1,71 @@
 import streamlit as st
 import os
-from dotenv import load_dotenv
-
-# Load environment variables
-load_dotenv()
 
 from crew import run_crew
 
+# -----------------------------
 # Page Configuration
+# -----------------------------
 st.set_page_config(
     page_title="AgentForge",
     page_icon="🚀",
     layout="centered"
 )
 
-# UI Header
-st.title("🚀 AgentForge – Multi-Agent AI Blog Generator")
-st.write("Generate AI-powered research and blog content using collaborative agents.")
+# -----------------------------
+# Header Section
+# -----------------------------
+st.title("🚀 AgentForge")
+st.subheader("Multi-Agent AI Blog Generator")
+st.write(
+    "Generate AI-powered research and structured blog content "
+    "using collaborative CrewAI agents."
+)
 
-# Get API key
+st.markdown("---")
+
+# -----------------------------
+# API Key Check (Streamlit Cloud Compatible)
+# -----------------------------
 api_key = os.getenv("OPENAI_API_KEY")
 
-# Validate API key
 if not api_key:
-    st.error("❌ OPENAI_API_KEY not found. Please configure your .env file.")
+    st.error("❌ OPENAI_API_KEY not found. Please configure it in Streamlit Secrets.")
     st.stop()
 
-# User Input
-topic = st.text_input("Enter Topic")
+# -----------------------------
+# User Input Section
+# -----------------------------
+topic = st.text_input(
+    "Enter Topic",
+    placeholder="Example: Artificial Intelligence in Healthcare"
+)
 
-# Generate Button
-if st.button("Generate"):
-    if not topic:
-        st.warning("⚠️ Please enter a topic.")
+generate_button = st.button("Generate Content")
+
+# -----------------------------
+# Execution Section
+# -----------------------------
+if generate_button:
+    if not topic.strip():
+        st.warning("⚠️ Please enter a valid topic.")
     else:
-        with st.spinner("🤖 Agents are working..."):
+        with st.spinner("🤖 Agents are collaborating..."):
             try:
                 result = run_crew(topic)
 
                 st.success("✅ Content Generated Successfully!")
+
                 st.markdown("---")
-                st.markdown(result)
+
+                with st.expander("📄 View Generated Content", expanded=True):
+                    st.markdown(result)
 
             except Exception as e:
-                st.error(f"🚨 Error occurred: {e}")
+                st.error(f"🚨 Error occurred: {str(e)}")
+
+# -----------------------------
+# Footer
+# -----------------------------
+st.markdown("---")
+st.caption("Built with CrewAI + Streamlit | AgentForge")
