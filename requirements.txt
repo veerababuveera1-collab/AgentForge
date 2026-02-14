@@ -1,5 +1,5 @@
 streamlit
 crewai
 langchain
-openai
+groq
 tiktoken
