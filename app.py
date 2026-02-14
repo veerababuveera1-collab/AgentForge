@@ -1,5 +1,9 @@
 import streamlit as st
 import os
+import sys
+
+# Fix import path for Streamlit Cloud
+sys.path.append(os.path.dirname(__file__))
 
 from crew import run_crew
 
@@ -13,7 +17,7 @@ st.set_page_config(
 )
 
 # -----------------------------
-# Header Section
+# Header
 # -----------------------------
 st.title("🚀 AgentForge")
 st.subheader("Multi-Agent AI Blog Generator")
@@ -25,7 +29,7 @@ st.write(
 st.markdown("---")
 
 # -----------------------------
-# API Key Check (Streamlit Cloud Compatible)
+# API Key Check
 # -----------------------------
 api_key = os.getenv("OPENAI_API_KEY")
 
@@ -34,19 +38,15 @@ if not api_key:
     st.stop()
 
 # -----------------------------
-# User Input Section
+# Input Section
 # -----------------------------
 topic = st.text_input(
     "Enter Topic",
     placeholder="Example: Artificial Intelligence in Healthcare"
 )
 
-generate_button = st.button("Generate Content")
+if st.button("Generate Content"):
 
-# -----------------------------
-# Execution Section
-# -----------------------------
-if generate_button:
     if not topic.strip():
         st.warning("⚠️ Please enter a valid topic.")
     else:
@@ -57,15 +57,10 @@ if generate_button:
                 st.success("✅ Content Generated Successfully!")
 
                 st.markdown("---")
-
-                with st.expander("📄 View Generated Content", expanded=True):
-                    st.markdown(result)
+                st.markdown(result)
 
             except Exception as e:
-                st.error(f"🚨 Error occurred: {str(e)}")
+                st.error(f"🚨 Error: {str(e)}")
 
-# -----------------------------
-# Footer
-# -----------------------------
 st.markdown("---")
 st.caption("Built with CrewAI + Streamlit | AgentForge")
