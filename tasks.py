@@ -1,19 +1,20 @@
 from crewai import Task
-from agents import research_agent, writer_agent
 
-def get_tasks(topic):
 
-    research_task = Task(
+def create_research_task(agent, topic):
+    return Task(
         description=f"Research the topic: {topic}. Provide detailed bullet-point insights.",
         expected_output="Structured research insights in bullet points.",
-        agent=research_agent
+        agent=agent
     )
 
-    writing_task = Task(
-        description="Using the research provided, write a complete blog article with introduction, body, and conclusion.",
+
+def create_writing_task(agent):
+    return Task(
+        description=(
+            "Using the research provided, write a complete blog article "
+            "with introduction, body, and conclusion."
+        ),
         expected_output="A well-structured blog post.",
-        agent=writer_agent
+        agent=agent
     )
-
-    return [research_task, writing_task]
-
