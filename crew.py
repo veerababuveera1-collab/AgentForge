@@ -25,7 +25,7 @@ def run_crew(topic: str) -> str:
     # 1. LLM Configuration (Groq Llama 3.1)
     # base_url ని జోడించడం వల్ల OpenAI కీ ఎర్రర్ (401) రాదు
     llm = LLM(
-        model="groq/llama-3.1-8b-instant",
+        model="groq/llama3-70b-8192",
         api_key=os.getenv("GROQ_API_KEY"),
         base_url="https://api.groq.com/openai/v1", # ఇది తప్పనిసరి
         temperature=0.3, # టోకెన్ వాడకాన్ని తగ్గించి Rate Limit రాకుండా చేస్తుంది
