@@ -1,6 +1,7 @@
 from crewai import Task
 
 def create_research_task(agent, topic):
+    """టాపిక్‌పై లోతైన పరిశోధన చేసే టాస్క్"""
     return Task(
         description=(
             f"Conduct a comprehensive investigation into '{topic}'. "
@@ -18,6 +19,7 @@ def create_research_task(agent, topic):
     )
 
 def create_writing_task(agent):
+    """పరిశోధన ఆధారంగా ప్రొఫెషనల్ బ్లాగ్ రాసే టాస్క్"""
     return Task(
         description=(
             "Using the research brief, compose a high-authority blog post. "
@@ -37,9 +39,7 @@ def create_writing_task(agent):
     )
 
 def create_linkedin_task(agent):
-    """
-    కొత్త టాస్క్: బ్లాగ్ రిపోర్టును ప్రొఫెషనల్ LinkedIn పోస్ట్‌గా మార్చడం.
-    """
+    """బ్లాగ్ నుండి వైరల్ LinkedIn పోస్ట్‌ను తయారు చేసే టాస్క్"""
     return Task(
         description=(
             "Extract the most impactful insights from the blog post and transform them into "
