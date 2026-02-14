@@ -1,11 +1,12 @@
 from crewai import Crew, Process
 from crewai.llm import LLM
 import os
-from agents import create_research_agent, create_writer_agent
-from tasks import create_research_task, create_writing_task
+# agents.py మరియు tasks.py లో కొత్త ఫంక్షన్లు యాడ్ చేయాలి
+from agents import create_research_agent, create_writer_agent, create_linkedin_manager_agent
+from tasks import create_research_task, create_writing_task, create_linkedin_task
 
 def run_crew(topic: str) -> str:
-    # 1. LLM Configuration - అప్‌గ్రేడ్: థ్రెషోల్డ్ మరియు టైమౌట్ సెట్టింగ్స్
+    # 1. LLM Configuration
     llm = LLM(
         model="groq/llama-3.1-8b-instant",
         api_key=os.getenv("GROQ_API_KEY"),
@@ -13,29 +14,31 @@ def run_crew(topic: str) -> str:
         max_tokens=4096
     )
 
-    # 2. ఏజెంట్ల తయారీ
+    # 2. ఏజెంట్ల తయారీ (LinkedIn Manager ని కలిపి)
     research_agent = create_research_agent(llm)
     writer_agent = create_writer_agent(llm)
+    linkedin_manager = create_linkedin_manager_agent(llm) # కొత్త ఏజెంట్
 
-    # 3. టాస్క్‌ల తయారీ
+    # 3. టాస్క్‌ల తయారీ (LinkedIn Task ని కలిపి)
     research_task = create_research_task(research_agent, topic)
     writing_task = create_writing_task(writer_agent)
+    linkedin_task = create_linkedin_task(linkedin_manager) # కొత్త టాస్క్
 
-    # 4. Crew అప్‌గ్రేడ్: Process మరియు Memory జోడింపు
+    # 4. Crew అప్‌గ్రేడ్: LinkedIn Task ని చివరగా జోడించాం
     crew = Crew(
-        agents=[research_agent, writer_agent],
-        tasks=[research_task, writing_task],
-        process=Process.sequential,  # పనులు ఒకదాని తర్వాత ఒకటి క్రమ పద్ధతిలో జరుగుతాయి
-        verbose=True,                # లాగ్స్ చూడటానికి
-        memory=True,                 # ఏజెంట్లు మునుపటి సమాచారాన్ని గుర్తుంచుకోవడానికి
-        cache=True                   # ఒకే రకమైన రిక్వెస్ట్‌లను వేగంగా పూర్తి చేయడానికి
+        agents=[research_agent, writer_agent, linkedin_manager],
+        tasks=[research_task, writing_task, linkedin_task],
+        process=Process.sequential, 
+        verbose=True,                
+        memory=True,                 
+        cache=True                   
     )
 
     try:
         # 5. Execution
         result = crew.kickoff()
         
-        # CrewAI 0.28+ వెర్షన్లలో result.raw వాడాలి
+        # రిజల్ట్ నేరుగా LinkedIn కి పంపే ఫార్మాట్‌లో ఉంటుంది
         return result.raw if hasattr(result, 'raw') else str(result)
         
     except Exception as e:
