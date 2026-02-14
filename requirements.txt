@@ -4,3 +4,4 @@ langchain
 litellm
 groq
 tiktoken
+python-dotenv
