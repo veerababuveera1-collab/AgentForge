@@ -9,7 +9,7 @@ from tasks import create_research_task, create_writing_task
 def run_crew(topic: str) -> str:
 
     llm = LLM(
-        model="groq/llama3-70b-8192",
+        model="groq/llama-3.1-8b-instant",
         api_key=os.getenv("GROQ_API_KEY")
     )
 
