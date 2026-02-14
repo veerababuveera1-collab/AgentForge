@@ -45,6 +45,7 @@ def create_linkedin_task(agent):
             "Extract the most impactful insights from the blog post and transform them into "
             "a viral-ready LinkedIn post. Use a strong hook, clean bullet points, and "
             "professional emojis. Ensure the tone is authoritative yet engaging."
+            "IMPORTANT: The entire post MUST be strictly under 2800 characters to fit LinkedIn's limits."
         ),
         expected_output=(
             "A ready-to-publish LinkedIn post featuring: \n"
