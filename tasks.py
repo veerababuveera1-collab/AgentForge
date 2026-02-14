@@ -35,3 +35,24 @@ def create_writing_task(agent):
         ),
         agent=agent
     )
+
+def create_linkedin_task(agent):
+    """
+    కొత్త టాస్క్: బ్లాగ్ రిపోర్టును ప్రొఫెషనల్ LinkedIn పోస్ట్‌గా మార్చడం.
+    """
+    return Task(
+        description=(
+            "Extract the most impactful insights from the blog post and transform them into "
+            "a viral-ready LinkedIn post. Use a strong hook, clean bullet points, and "
+            "professional emojis. Ensure the tone is authoritative yet engaging."
+        ),
+        expected_output=(
+            "A ready-to-publish LinkedIn post featuring: \n"
+            "- A compelling headline/hook\n"
+            "- 3-5 high-value bullet points\n"
+            "- Strategic professional emojis (🚀, 📈, 💡)\n"
+            "- A call to action (CTA)\n"
+            "- 5 relevant trending hashtags."
+        ),
+        agent=agent
+    )
