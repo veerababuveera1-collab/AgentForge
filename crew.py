@@ -24,9 +24,9 @@ def run_crew(topic: str) -> str:
     
     # 1. LLM Configuration (Groq Llama 3.1)
     llm = LLM(
-        model="groq/llama-3.1-8b-instant",
+        model="llama3-70b-8192",
         api_key=os.getenv("GROQ_API_KEY"),
-        temperature=0.7,
+        temperature=0.5,
         max_tokens=4096
     )
 
