@@ -20,47 +20,57 @@ st.set_page_config(
 # Header
 # -----------------------------
 st.title("🚀 AgentForge")
-st.subheader("Multi-Agent AI Blog Generator")
+st.subheader("Multi-Agent AI Blog Generator (Powered by Groq)")
 st.write(
     "Generate AI-powered research and structured blog content "
-    "using collaborative CrewAI agents."
+    "using collaborative CrewAI agents running on Groq."
 )
 
 st.markdown("---")
 
 # -----------------------------
-# API Key Check
+# API Key Check (Groq)
 # -----------------------------
-api_key = os.getenv("OPENAI_API_KEY")
+api_key = os.getenv("GROQ_API_KEY")
 
 if not api_key:
-    st.error("❌ OPENAI_API_KEY not found. Please configure it in Streamlit Secrets.")
+    st.error("❌ GROQ_API_KEY not found. Please configure it in Streamlit Secrets.")
     st.stop()
 
 # -----------------------------
-# Input Section
+# User Input
 # -----------------------------
 topic = st.text_input(
     "Enter Topic",
     placeholder="Example: Artificial Intelligence in Healthcare"
 )
 
-if st.button("Generate Content"):
+generate_button = st.button("Generate Content")
+
+# -----------------------------
+# Execution Section
+# -----------------------------
+if generate_button:
 
     if not topic.strip():
         st.warning("⚠️ Please enter a valid topic.")
     else:
-        with st.spinner("🤖 Agents are collaborating..."):
+        with st.spinner("🤖 Agents are collaborating with Groq..."):
             try:
                 result = run_crew(topic)
 
                 st.success("✅ Content Generated Successfully!")
 
                 st.markdown("---")
-                st.markdown(result)
+
+                with st.expander("📄 View Generated Content", expanded=True):
+                    st.markdown(result)
 
             except Exception as e:
-                st.error(f"🚨 Error: {str(e)}")
+                st.error(f"🚨 Error occurred: {str(e)}")
 
+# -----------------------------
+# Footer
+# -----------------------------
 st.markdown("---")
-st.caption("Built with CrewAI + Streamlit | AgentForge")
+st.caption("Built with CrewAI + Groq + Streamlit | AgentForge")
