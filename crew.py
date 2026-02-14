@@ -8,18 +8,13 @@ from tasks import create_research_task, create_writing_task
 
 def run_crew(topic: str) -> str:
 
-    # Create Groq LLM using LiteLLM format
     llm = LLM(
         model="groq/llama3-70b-8192",
         api_key=os.getenv("GROQ_API_KEY")
     )
 
-    research_agent = create_research_agent()
-    writer_agent = create_writer_agent()
-
-    # Assign LLM explicitly
-    research_agent.llm = llm
-    writer_agent.llm = llm
+    research_agent = create_research_agent(llm)
+    writer_agent = create_writer_agent(llm)
 
     research_task = create_research_task(research_agent, topic)
     writing_task = create_writing_task(writer_agent)
