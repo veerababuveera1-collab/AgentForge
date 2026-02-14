@@ -28,8 +28,8 @@ def run_crew(topic: str) -> str:
         model="groq/llama-3.1-8b-instant",
         api_key=os.getenv("GROQ_API_KEY"),
         base_url="https://api.groq.com/openai/v1", # ఇది తప్పనిసరి
-        temperature=0.5, # టోకెన్ వాడకాన్ని తగ్గించి Rate Limit రాకుండా చేస్తుంది
-        max_tokens=2048
+        temperature=0.3, # టోకెన్ వాడకాన్ని తగ్గించి Rate Limit రాకుండా చేస్తుంది
+        max_tokens=1500
     )
 
     # 2. ఏజెంట్ల తయారీ (Initializing Agents)
