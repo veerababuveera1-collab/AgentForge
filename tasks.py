@@ -1,59 +1,60 @@
 from crewai import Task
 
 def create_research_task(agent, topic):
-    """టాపిక్‌పై లోతైన పరిశోధన చేసే టాస్క్"""
+    """టాపిక్‌పై లోతైన మరియు గణాంక ఆధారిత పరిశోధన చేసే టాస్క్"""
     return Task(
         description=(
-            f"Conduct a comprehensive investigation into '{topic}'. "
-            "Identify the latest trends, key challenges, and future predictions. "
-            "Focus on finding data-backed insights and expert opinions."
+            f"Conduct a deep-dive investigation into '{topic}'. "
+            "Go beyond the surface: find 'Golden Nuggets' of information, "
+            "surprising statistics, and future-forward predictions. "
+            "Focus on finding specific data points that make the content authoritative."
         ),
         expected_output=(
-            "A comprehensive research brief containing: \n"
-            "1. Executive Summary\n"
-            "2. Key Findings (Bullet points)\n"
-            "3. Relevant Statistics/Data points\n"
-            "4. List of potential sub-headings for the blog."
+            "A high-impact Research Dossier containing: \n"
+            "1. The 'Big Idea' (2-sentence executive summary)\n"
+            "2. 5 Mind-blowing Statistics or Industry Facts\n"
+            "3. Key Challenges & Future Outlook\n"
+            "4. A list of 4 'Click-worthy' blog headings."
         ),
         agent=agent
     )
 
 def create_writing_task(agent):
-    """పరిశోధన ఆధారంగా ప్రొఫెషనల్ బ్లాగ్ రాసే టాస్క్"""
+    """పరిశోధనను ఒక అద్భుతమైన కథనంగా (Blog) మార్చే టాస్క్"""
     return Task(
         description=(
-            "Using the research brief, compose a high-authority blog post. "
-            "The content should be professional, insightful, and formatted using Markdown. "
-            "Ensure you include a catchy title, sub-headers, and a call to action."
+            "Transform the research dossier into a 'Masterclass' blog post. "
+            "The tone should be 'Sophisticated yet Conversational'. "
+            "Use storytelling to make complex data easy to digest. "
+            "Ensure you use a 'Pattern Interrupt' hook in the first paragraph to grab attention."
         ),
         expected_output=(
-            "A complete, publication-ready blog post in Markdown format. "
-            "Structure: \n"
-            "- # [Catchy H1 Title]\n"
-            "- ## Introduction\n"
-            "- ## Key Trends/Insights (using H2 headers)\n"
-            "- ## Strategic Implications\n"
-            "- ## Conclusion & Summary"
+            "A publication-ready Markdown masterpiece featuring: \n"
+            "- # [A Magnetic, Catchy H1 Title]\n"
+            "- ## The Hook (Introduction that creates curiosity)\n"
+            "- ## Deep Dive (Well-structured insights using H2 headers)\n"
+            "- ## Strategic Implications (The 'So What?' factor)\n"
+            "- ## Final Verdict (Conclusion with a strong Call to Action)"
         ),
         agent=agent
     )
 
 def create_linkedin_task(agent):
-    """బ్లాగ్ నుండి వైరల్ LinkedIn పోస్ట్‌ను తయారు చేసే టాస్క్"""
+    """బ్లాగ్ నుండి వైరల్ అయ్యే LinkedIn పోస్ట్‌ను సిద్ధం చేసే టాస్క్"""
     return Task(
         description=(
-            "Extract the most impactful insights from the blog post and transform them into "
-            "a viral-ready LinkedIn post. Use a strong hook, clean bullet points, and "
-            "professional emojis. Ensure the tone is authoritative yet engaging."
-            "IMPORTANT: The entire post MUST be strictly under 2800 characters to fit LinkedIn's limits."
+            "Distill the soul of the blog post into a viral-potential LinkedIn update. "
+            "Use the 'Hook-Value-CTA' framework. Make it visually airy with plenty of white space. "
+            "Use professional emojis strategically to guide the reader's eye. "
+            "IMPORTANT: The total text MUST be strictly under 2800 characters to prevent errors."
         ),
         expected_output=(
-            "A ready-to-publish LinkedIn post featuring: \n"
-            "- A compelling headline/hook\n"
-            "- 3-5 high-value bullet points\n"
-            "- Strategic professional emojis (🚀, 📈, 💡)\n"
-            "- A call to action (CTA)\n"
-            "- 5 relevant trending hashtags."
+            "A high-conversion LinkedIn post featuring: \n"
+            "- ⚡ A 'Scroll-Stopping' first line (The Hook)\n"
+            "- 💡 3-5 Actionable 'Pro-Tips' or insights\n"
+            "- 📊 1 Powerful statistic to build trust\n"
+            "- 🚀 A punchy Call to Action (CTA) that encourages comments\n"
+            "- 🏷️ 5 Trending hashtags (format: #AI #Tech - do not include the word 'hashtag')."
         ),
         agent=agent
     )
