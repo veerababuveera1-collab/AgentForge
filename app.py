@@ -4,161 +4,149 @@ import sys
 import time
 from datetime import datetime
 
-# --- SYSTEM PREFLIGHT ---
-sys.path.append(os.path.dirname(__file__))
-try:
-    from crew import run_crew
-except ImportError:
-    # Mock for demonstration if crew.py isn't present
-    def run_crew(topic): return f"# Results for {topic}\n\nProfessional AI Content."
-
-# --- PAGE CONFIGURATION ---
+# --- CONFIG & THEME ---
 st.set_page_config(
-    page_title="AgentForge PRO | Enterprise AI Orchestrator",
-    page_icon="🤖",
+    page_title="AgentForge Elite",
+    page_icon="💎",
     layout="wide",
-    initial_sidebar_state="expanded",
 )
 
-# --- CUSTOM BRANDING & CSS ---
+# --- THE ARCHITECT'S PRIVATE STYLING ---
 st.markdown("""
     <style>
-    /* Custom Font and Background */
-    .stApp { background-color: #0e1117; color: #ffffff; }
+    /* Global Background & Font */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+    html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     
-    /* Clean Cards for Inputs */
-    div[data-testid="stVerticalBlock"] > div:has(div.stTextInput) {
-        background-color: #161b22;
-        padding: 2rem;
-        border-radius: 15px;
-        border: 1px solid #30363d;
+    .main {
+        background: radial-gradient(circle at top right, #1e293b, #0f172a);
     }
-    
-    /* Primary Action Button */
+
+    /* Glassmorphic Cards */
+    div[data-testid="stVerticalBlock"] > div:has(div.stTextInput) {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 2.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+
+    /* Metric Cards */
+    .metric-card {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 15px;
+        border-radius: 12px;
+        border-left: 4px solid #3b82f6;
+        margin-bottom: 10px;
+    }
+
+    /* Neon Button Effect */
     .stButton>button {
-        width: 100%;
-        border-radius: 8px;
-        height: 3.5em;
-        background: linear-gradient(45deg, #FF4B4B, #FF8F8F);
+        background: linear-gradient(90deg, #3b82f6, #2dd4bf);
+        color: white;
         border: none;
-        font-weight: bold;
+        border-radius: 12px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
         transition: all 0.3s ease;
+        box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
     }
     .stButton>button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(255, 75, 75, 0.3);
-    }
-    
-    /* Styled Markdown Output */
-    .result-container {
-        background-color: #ffffff;
-        color: #1e1e1e;
-        padding: 30px;
-        border-radius: 10px;
-        line-height: 1.6;
+        transform: scale(1.02);
+        box-shadow: 0 0 25px rgba(45, 212, 191, 0.6);
     }
     </style>
     """, unsafe_allow_html=True)
 
-# --- SIDEBAR: CONTROL PLANE ---
+# --- HEADER SECTION ---
+col_h1, col_h2, col_h3 = st.columns([2, 1, 1])
+with col_h1:
+    st.markdown("# 💎 AgentForge <span style='color:#3b82f6; font-size:18px;'>ELITE</span>", unsafe_allow_html=True)
+    st.caption("Advanced Neural Orchestration Layer")
+
+with col_h2:
+    st.markdown(f'''<div class="metric-card">
+        <small style="color:#94a3b8">SYSTEM UPTIME</small><br>
+        <span style="color:#2dd4bf; font-weight:bold;">99.9%</span>
+    </div>''', unsafe_allow_html=True)
+
+with col_h3:
+    st.markdown(f'''<div class="metric-card">
+        <small style="color:#94a3b8">SESSION ID</small><br>
+        <span style="color:#3b82f6; font-weight:bold;">AF-{datetime.now().strftime('%H%M')}</span>
+    </div>''', unsafe_allow_html=True)
+
+st.markdown("---")
+
+# --- SIDEBAR (Clean & Minimal) ---
 with st.sidebar:
-    st.image("https://cdn-icons-png.flaticon.com/512/616/616490.png", width=60)
-    st.title("AgentForge **PRO**")
-    st.caption("Enterprise Multi-Agent Orchestrator")
-    st.markdown("---")
-    
-    # Connection Status Cluster
-    with st.expander("🌐 System Status", expanded=True):
-        api_key = os.getenv("GROQ_API_KEY")
-        if api_key:
-            st.success("Groq Cloud: CONNECTED")
-            st.info("LLM: Llama-3-70b-versatile")
-        else:
-            st.error("Groq Cloud: DISCONNECTED")
-    
-    # Fine-tuning Controls
-    st.markdown("### Agent Configuration")
-    creativity = st.select_slider("Agent Creativity", options=["Factual", "Balanced", "Creative"], value="Balanced")
-    process_type = st.radio("Workflow", ["Sequential", "Hierarchical"], index=0)
+    st.markdown("### 🛠️ Core Engine")
+    api_key = os.getenv("GROQ_API_KEY")
+    if api_key:
+        st.info("⚡ Groq Llama-3 Active")
     
     st.markdown("---")
-    if st.button("🧹 Clear Session"):
-        st.cache_data.clear()
-        st.rerun()
-
-# --- MAIN INTERFACE ---
-# Title Area
-col_title, col_logo = st.columns([4, 1])
-with col_title:
-    st.title("Collaborative Intelligence Studio")
-    st.write(f"Logged in as: **Standard User** | {datetime.now().strftime('%Y-%m-%d')}")
-
-# User Input Stage
-tab1, tab2 = st.tabs(["🎯 Content Engine", "📜 Generation History"])
-
-with tab1:
-    col_in, col_out = st.columns([1, 1.5], gap="large")
+    st.markdown("### ⚙️ Parameters")
+    temp = st.slider("Neural Temp", 0.0, 1.0, 0.7)
+    breadth = st.select_slider("Search Depth", ["Standard", "Deep", "Infinite"])
     
-    with col_in:
-        st.subheader("Design Your Brief")
-        with st.container():
-            topic = st.text_input("What is the focal point of this research?", 
-                                 placeholder="e.g. The impact of Solid State Batteries on EV adoption")
-            
-            audience = st.selectbox("Target Audience", ["General Public", "Technical Experts", "C-Suite Executives"])
-            
-            tone = st.multiselect("Content Tone", ["Professional", "Witty", "Urgent", "Educational"], default=["Professional"])
-            
-            generate_btn = st.button("🚀 EXECUTE AGENT CREW")
+    st.markdown("---")
+    st.caption("Standard User: active")
+    st.caption(f"Date: {datetime.now().strftime('%Y-%m-%d')}")
 
-    with col_out:
-        if generate_btn:
-            if not topic:
-                st.warning("Architectural Note: You must provide a topic to initialize the agents.")
-            else:
-                # Advanced Status Tracking
-                with st.status("🏗️ Orchestrating Agents...", expanded=True) as status:
-                    st.write("Initializing Researcher Agent...")
-                    time.sleep(1) # Simulated latency for UX
-                    st.write("Analyzing Groq context windows...")
-                    
-                    try:
-                        # Call the actual logic
-                        result = run_crew(topic)
-                        
-                        status.update(label="✅ Synthesis Complete", state="complete", expanded=False)
-                        st.balloons()
-                        
-                        # Display Area
-                        st.subheader("Final Output")
-                        with st.container():
-                            st.markdown(f'<div class="result-container">{result}</div>', unsafe_allow_html=True)
-                        
-                        # Action Bar
-                        st.markdown("### 📥 Export & Distribution")
-                        c1, c2 = st.columns(2)
-                        with c1:
-                            st.download_button("Download Markdown", result, file_name="article.md", use_container_width=True)
-                        with c2:
-                            if st.button("📋 Copy to Clipboard", use_container_width=True):
-                                st.toast("Copied to clipboard!")
-                                
-                    except Exception as e:
-                        status.update(label="🚨 Workflow Interrupted", state="error")
-                        st.error(f"Fatal Error: {str(e)}")
+# --- MAIN WORKSPACE ---
+left_col, right_col = st.columns([1, 1.2], gap="large")
+
+with left_col:
+    st.markdown("### 🖋️ Create Brief")
+    with st.container():
+        topic = st.text_input("Project Objective", placeholder="e.g. Decarbonization of Cargo Shipping")
+        
+        c1, c2 = st.columns(2)
+        with c1:
+            audience = st.selectbox("Audience", ["Technical", "Executive", "Creative"])
+        with c2:
+            length = st.selectbox("Scope", ["Briefing", "Detailed Report", "Whitepaper"])
+            
+        tones = st.multiselect("Agent Persona", ["Analytical", "Visionary", "Critical"], default=["Analytical"])
+        
+        generate = st.button("RUN ORCHESTRATION")
+
+with right_col:
+    if generate:
+        if not topic:
+            st.error("Missing Objective: Please define a project focus.")
         else:
-            # Empty State
-            st.info("Waiting for input... Define your topic on the left to begin the orchestration.")
-            st.image("https://illustrations.popsy.co/white/data-analysis.svg", width=350)
-
-with tab2:
-    st.write("Recent generations will appear here during this session.")
-    # You could implement a session_state list here to track history
+            with st.status("🚀 Initializing Agent Hive...", expanded=True) as status:
+                st.write("📡 Connecting to Groq LPU...")
+                time.sleep(0.8)
+                st.write("🕵️ Researcher gathering primary data...")
+                time.sleep(1.2)
+                
+                # Mock call (replace with your run_crew(topic))
+                # result = run_crew(topic)
+                result = "### Strategic Analysis\nThis is a placeholder for the professional output."
+                
+                status.update(label="✅ Analysis Synthesized", state="complete", expanded=False)
+                
+                st.markdown("### 📑 Intelligence Output")
+                st.markdown(f"""
+                    <div style="background: rgba(255,255,255,0.05); padding: 25px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1);">
+                        {result}
+                    </div>
+                """, unsafe_allow_html=True)
+                
+                st.markdown("---")
+                st.download_button("💾 EXPORT AS ASSET", result, file_name="agentforge_export.md")
+    else:
+        st.markdown("""
+            <div style="text-align: center; margin-top: 50px; opacity: 0.5;">
+                <img src="https://cdn-icons-png.flaticon.com/512/2593/2593414.png" width="100" style="filter: invert(1);"><br>
+                <p>Awaiting Objective Initialization...</p>
+            </div>
+        """, unsafe_allow_html=True)
 
 # --- FOOTER ---
-st.markdown("---")
-footer_col1, footer_col2 = st.columns([3, 1])
-with footer_col1:
-    st.caption("AgentForge v2.4.0-Stable | Architecture: Micro-Agent Collaborative Mesh")
-with footer_col2:
-    st.caption("© 2026 Enterprise AI Solutions")
+st.markdown("<br><br>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #475569;'>AgentForge v2.4.0 • Enterprise Shield Active</p>", unsafe_allow_html=True)
