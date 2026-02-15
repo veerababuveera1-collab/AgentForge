@@ -2,12 +2,18 @@ import streamlit as st
 import os
 import requests
 from datetime import datetime
+from dotenv import load_dotenv
+
+# --- LOAD ENVIRONMENT VARIABLES ---
+load_dotenv()
 
 # --- IMPORT YOUR CREW LOGIC ---
+# ఇక్కడ ఒక చిన్న మార్పు: నేరుగా run_crew ని ఇంపోర్ట్ చేస్తున్నాం
 try:
-    from crew import run_crew 
+    from crew import run_agentic_workflow as run_crew 
 except ImportError:
-    st.error("Error: crew.py file not found. Please ensure crew.py is in the same directory.")
+    # ఒకవేళ ఫైల్ దొరకకపోతే, క్లియర్ మెసేజ్ చూపిస్తుంది
+    st.error("🚨 Error: 'crew.py' file not found in the current directory.")
 
 # --- CONFIG & THEME ---
 st.set_page_config(
@@ -17,7 +23,6 @@ st.set_page_config(
 )
 
 # --- WEBHOOK CONFIG ---
-# మీ వెబ్‌హుక్ URL ఇక్కడ ఇంటిగ్రేట్ చేయబడింది
 MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/m4dzevy0jky3h3r86cbrhedvyibjkt8j"
 
 # --- THE ARCHITECT'S PRIVATE STYLING ---
@@ -38,6 +43,7 @@ st.markdown("""
         padding: 25px; border-radius: 15px;
         border: 1px solid rgba(255, 255, 255, 0.1);
         color: white; line-height: 1.6;
+        white-space: pre-wrap; /* బోల్డ్ యూనికోడ్ సరిగ్గా కనిపించడానికి */
     }
     </style>
     """, unsafe_allow_html=True)
@@ -75,19 +81,23 @@ with right_col:
         else:
             with st.status("📡 Orchestrating Agent Hive...", expanded=True) as status:
                 try:
-                    # Execute CrewAI Logic
+                    # Execute CrewAI Logic (From crew.py)
                     response = run_crew(topic)
-                    # Extract raw text from response
+                    
+                    # CrewAI 0.28+ వెర్షన్ల కోసం .raw వాడాలి
                     st.session_state.final_report = response.raw if hasattr(response, 'raw') else str(response)
+                    
                     status.update(label="✅ Analysis Synthesized", state="complete", expanded=False)
                 except Exception as e:
                     status.update(label="🚨 Fault Detected", state="error")
                     st.error(f"Execution Error: {str(e)}")
 
-    # రిపోర్ట్ జనరేట్ అయిన తర్వాత మాత్రమే ఈ సెక్షన్ కనిపిస్తుంది
     if st.session_state.final_report:
         st.markdown("### 📑 Intelligence Output")
-        st.markdown(f'<div class="output-box">{st.session_state.final_report}</div>', unsafe_allow_html=True)
+        # Unicode Bold అక్షరాలు ప్రొఫెషనల్ గా కనిపించడానికి markdown వాడుతున్నాం
+        st.markdown(f'<div class="output-box">', unsafe_allow_html=True)
+        st.markdown(st.session_state.final_report)
+        st.markdown('</div>', unsafe_allow_html=True)
         
         st.markdown("---")
         st.markdown("### 📢 Social Distribution")
@@ -100,7 +110,7 @@ with right_col:
             if st.button("🚀 PUBLISH TO LINKEDIN"):
                 with st.spinner("Pushing to LinkedIn via Make.com..."):
                     try:
-                        # Webhook కి డేటా పంపడం
+                        # Unicode Content ని Webhook కి పంపడం
                         payload = {"message": st.session_state.final_report}
                         res = requests.post(MAKE_WEBHOOK_URL, json=payload)
                         
