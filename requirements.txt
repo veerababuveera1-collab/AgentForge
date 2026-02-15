@@ -2,3 +2,4 @@ streamlit
 crewai
 langchain-groq
 python-dotenv
+litellm         
