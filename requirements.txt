@@ -1,13 +1,7 @@
 streamlit
 crewai
-langchain
-litellm
-groq
-tiktoken
-python-dotenv
-streamlit
-crewai
 langchain-groq
 python-dotenv
 requests
-pydantic>=2.0.0
+pydantic>=2.4.2,<3.0.0
+langchain-core>=0.1.0
