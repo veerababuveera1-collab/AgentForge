@@ -5,78 +5,72 @@ from crewai import Crew, Process, LLM
 from agents import research_agent, writer_agent, linkedin_agent
 from tasks import create_research_task, create_writing_task, create_linkedin_task
 
-# 1. Load Environment Variables (API Keys)
+# 1. పర్యావరణ వేరియబుల్స్ లోడ్ చేయడం
 load_dotenv()
 
-# Streamlit Page UI Settings
-st.set_page_config(page_title="AgentForge ELITE", page_icon="⚡", layout="wide")
-st.title("⚡ AgentForge ELITE")
-st.markdown("*Professional AI Content Orchestration for LinkedIn*")
+# స్ట్రీమ్‌లిట్ UI సెట్టింగ్స్
+st.set_page_config(page_title="AgentForge ELITE", page_icon="💎", layout="wide")
+st.title("💎 AgentForge ELITE")
+st.markdown("*Professional Neural Orchestration & Social Distribution*")
 
-# 2. LLM Configuration (FIX: Increased max_tokens to prevent content loss)
+# 2. LLM కాన్ఫిగరేషన్ (కంటెంట్ మిస్ అవ్వకుండా max_tokens పెంచాం)
 smart_llm = LLM(
     model="groq/llama-3.3-70b-versatile",
     api_key=os.getenv("GROQ_API_KEY"),
     temperature=0.3,
-    max_tokens=4096,  # 👈 ముఖ్యమైన మార్పు: దీనివల్ల కంటెంట్ అసంపూర్తిగా ఆగదు
+    max_tokens=4096,  # 👈 కంటెంట్ మధ్యలో ఆగిపోకుండా ఉండటానికి ఇది కీలకం
     max_retries=5
 )
 
 def run_agentic_workflow(topic):
-    # Assign the upgraded LLM to all agents
+    # ఏజెంట్లకు అప్‌గ్రేడ్ చేసిన LLMని కేటాయించడం
     research_agent.llm = smart_llm
     writer_agent.llm = smart_llm
     linkedin_agent.llm = smart_llm
 
-    # Initialize Tasks
+    # టాస్క్‌లను ఇనిషియలైజ్ చేయడం
     research_task = create_research_task(research_agent, topic)
     writing_task = create_writing_task(writer_agent)
     linkedin_task = create_linkedin_task(linkedin_agent)
 
-    # Crew Assembly (Memory is set to False for Streamlit stability)
+    # Crew అసెంబ్లీ
     crew = Crew(
         agents=[research_agent, writer_agent, linkedin_agent],
         tasks=[research_task, writing_task, linkedin_task],
         process=Process.sequential,
-        memory=False, 
+        memory=False, # స్ట్రీమ్‌లిట్ స్థిరత్వం కోసం ప్రస్తుతానికి False
         verbose=True,
         cache=True
     )
 
     return crew.kickoff()
 
-# 3. Streamlit GUI Elements
-with st.sidebar:
-    st.header("Settings")
-    st.info("Using Model: Llama-3.3-70b (Groq)")
-    if not os.getenv("GROQ_API_KEY"):
-        st.error("⚠️ GROQ_API_KEY not found in .env!")
+# 3. స్ట్రీమ్‌లిట్ GUI ఎలిమెంట్స్
+topic_input = st.text_input("Project Objective:", "The Emergence of Agent-First Architecture")
 
-topic_input = st.text_input("Enter Topic / Project Objective:", "The Emergence of Agent-First Architecture")
-
-if st.button("🚀 Run Orchestration"):
+if st.button("🚀 RUN ORCHESTRATION"):
     if topic_input:
-        with st.status("Agents are coordinating...", expanded=True) as status:
+        with st.status("Neural agents are coordinating...", expanded=True) as status:
             try:
-                st.write("🔍 Researching technical patterns...")
-                # Start the workflow
+                st.write("🔍 Identifying industry-standard statistics...")
+                # వర్క్‌ఫ్లో ప్రారంభం
                 result = run_agentic_workflow(topic_input)
                 
-                status.update(label="✅ Content Generation Complete!", state="complete", expanded=False)
+                status.update(label="✅ Intelligence Generated!", state="complete", expanded=False)
                 
-                # Display Output
+                # అవుట్‌పుట్ ప్రదర్శన
                 st.divider()
-                st.subheader("Your Elite LinkedIn Post")
+                st.subheader("Your Upgraded LinkedIn Post")
                 
-                # st.markdown handles the bold unicode perfectly
+                # స్ట్రీమ్‌లిట్ మార్క్‌డౌన్ మీ బోల్డ్ యూనికోడ్‌ను పర్ఫెక్ట్‌గా చూపిస్తుంది
                 st.markdown(result.raw)
                 
-                # Easy Copy Section
+                # ఈజీ కాపీ సెక్షన్
                 st.divider()
-                st.write("📋 **Copy for LinkedIn:**")
+                st.write("📋 **Copy the content below:**")
                 st.text_area(label="", value=result.raw, height=450)
                 
             except Exception as e:
                 st.error(f"Error: {str(e)}")
     else:
-        st.warning("Please enter a topic first.")
+        st.warning("Please enter a project objective.")
