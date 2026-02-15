@@ -5,3 +5,9 @@ litellm
 groq
 tiktoken
 python-dotenv
+streamlit
+crewai
+langchain-groq
+python-dotenv
+requests
+pydantic>=2.0.0
