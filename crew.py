@@ -1,57 +1,82 @@
 import os
+import streamlit as st
+from dotenv import load_dotenv
 from crewai import Crew, Process, LLM
 from agents import research_agent, writer_agent, linkedin_agent
 from tasks import create_research_task, create_writing_task, create_linkedin_task
-from dotenv import load_dotenv
 
-# .env ఫైల్ నుండి API Keys లోడ్ చేయడం కోసం
+# 1. Load Environment Variables (API Keys)
 load_dotenv()
 
-# 1. LLM Configuration
-# Groq వంటి మోడల్స్ వాడేటప్పుడు temperature మరియు max_tokens సెట్టింగ్స్ కీలకం
+# Streamlit Page UI Settings
+st.set_page_config(page_title="AgentForge ELITE", page_icon="⚡", layout="wide")
+st.title("⚡ AgentForge ELITE")
+st.markdown("*Professional AI Content Orchestration for LinkedIn*")
+
+# 2. LLM Configuration (FIX: Increased max_tokens to prevent content loss)
 smart_llm = LLM(
     model="groq/llama-3.3-70b-versatile",
     api_key=os.getenv("GROQ_API_KEY"),
     temperature=0.3,
-    max_tokens=4096,  # కంటెంట్ కట్ అవ్వకుండా ఉండటానికి పెద్ద లిమిట్
+    max_tokens=4096,  # 👈 ముఖ్యమైన మార్పు: దీనివల్ల కంటెంట్ అసంపూర్తిగా ఆగదు
     max_retries=5
 )
 
 def run_agentic_workflow(topic):
-    # 2. Assign LLM to Agents (Before Task Creation)
-    # ఏజెంట్లు టాస్క్‌లను ప్రాసెస్ చేయడానికి ముందే LLM ని సెట్ చేయాలి
+    # Assign the upgraded LLM to all agents
     research_agent.llm = smart_llm
     writer_agent.llm = smart_llm
     linkedin_agent.llm = smart_llm
 
-    # 3. Task Initialization
+    # Initialize Tasks
     research_task = create_research_task(research_agent, topic)
     writing_task = create_writing_task(writer_agent)
     linkedin_task = create_linkedin_task(linkedin_agent)
 
-    # 4. Crew Assembly
-    # CrewAI లో 'memory' ఫీచర్ వాడాలంటే 'embedder' కాన్ఫిగరేషన్ అవసరం ఉండొచ్చు, 
-    # ఒకవేళ ఎర్రర్ వస్తే memory=False చేసి చూడండి.
+    # Crew Assembly (Memory is set to False for Streamlit stability)
     crew = Crew(
         agents=[research_agent, writer_agent, linkedin_agent],
         tasks=[research_task, writing_task, linkedin_task],
         process=Process.sequential,
-        memory=True,     # పాత సమాచారాన్ని గుర్తుంచుకోవడానికి
-        verbose=True,    # టెర్మినల్‌లో ప్రాసెస్ చూడటానికి
+        memory=False, 
+        verbose=True,
         cache=True
     )
 
     return crew.kickoff()
 
-if __name__ == "__main__":
-    # ఎగ్జిక్యూషన్ స్టార్ట్
-    target_topic = "The Emergence of Agent-First Architecture"
-    
-    try:
-        result = run_agentic_workflow(target_topic)
-        print("\n\n" + "="*50)
-        print("🚀 FINAL ELITE POST GENERATED SUCCESSFULLY:")
-        print("="*50 + "\n")
-        print(result)
-    except Exception as e:
-        print(f"❌ An error occurred: {e}")
+# 3. Streamlit GUI Elements
+with st.sidebar:
+    st.header("Settings")
+    st.info("Using Model: Llama-3.3-70b (Groq)")
+    if not os.getenv("GROQ_API_KEY"):
+        st.error("⚠️ GROQ_API_KEY not found in .env!")
+
+topic_input = st.text_input("Enter Topic / Project Objective:", "The Emergence of Agent-First Architecture")
+
+if st.button("🚀 Run Orchestration"):
+    if topic_input:
+        with st.status("Agents are coordinating...", expanded=True) as status:
+            try:
+                st.write("🔍 Researching technical patterns...")
+                # Start the workflow
+                result = run_agentic_workflow(topic_input)
+                
+                status.update(label="✅ Content Generation Complete!", state="complete", expanded=False)
+                
+                # Display Output
+                st.divider()
+                st.subheader("Your Elite LinkedIn Post")
+                
+                # st.markdown handles the bold unicode perfectly
+                st.markdown(result.raw)
+                
+                # Easy Copy Section
+                st.divider()
+                st.write("📋 **Copy for LinkedIn:**")
+                st.text_area(label="", value=result.raw, height=450)
+                
+            except Exception as e:
+                st.error(f"Error: {str(e)}")
+    else:
+        st.warning("Please enter a topic first.")
