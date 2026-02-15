@@ -1,6 +1,8 @@
 from crewai import Agent
-from langchain_groq import ChatGroq # మీరు Groq వాడుతున్నారు కాబట్టి ఇది అలాగే ఉంటుంది
 import os
+
+# గమనిక: crew.py లో LLMని డిఫైన్ చేసి ఇక్కడికి పాస్ చేస్తున్నాం కాబట్టి 
+# ఇక్కడ విడిగా ChatGroq ఇంపోర్ట్ అవసరం లేదు, కానీ బ్యాకప్ కోసం ఉంచవచ్చు.
 
 def create_researcher_agent(llm):
     return Agent(
@@ -33,11 +35,12 @@ def create_writer_agent(llm):
 def create_linkedin_manager_agent(llm):
     return Agent(
         role='Visionary LinkedIn Strategist',
-        goal='Design arresting, high-contrast digital experiences on social media.',
+        goal='Design high-contrast, visually arresting social media experiences for Veera Babu Veera.',
         backstory=(
             "You are an expert in 'Psychological Hooks' and 'Visual Contrast'. "
-            "You know how to use bold unicode, roman numerals, and whitespace "
-            "to stop the scroll and force engagement. You represent Veera Babu Veera."
+            "You are the digital voice of Veera Babu Veera. Your mission is to "
+            "ensure every post ends with a strong personal brand signature and "
+            "uses bold unicode to dominate the LinkedIn feed."
         ),
         allow_delegation=False,
         llm=llm,
