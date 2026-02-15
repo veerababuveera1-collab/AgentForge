@@ -7,8 +7,8 @@ from tasks import create_research_task, create_writing_task, create_linkedin_tas
 # 1. పర్యావరణ వేరియబుల్స్ లోడ్ చేయడం
 load_dotenv()
 
-# 2. LLM కాన్ఫిగరేషన్
-# max_tokens=4096 వల్ల మీ కంటెంట్ మధ్యలో ఆగిపోదు
+# 2. Groq LLM కాన్ఫిగరేషన్
+# ఇక్కడ మనం Groqని స్పష్టంగా డిఫైన్ చేస్తున్నాం
 smart_llm = LLM(
     model="groq/llama-3.3-70b-versatile",
     api_key=os.getenv("GROQ_API_KEY"),
@@ -19,28 +19,36 @@ smart_llm = LLM(
 
 def run_crew(topic):
     """
-    ఈ ఫంక్షన్‌ను app.py పిలుస్తుంది. 
-    ఇది ఏజెంట్లను మరియు టాస్క్‌లను సమన్వయం చేసి ఫైనల్ రిపోర్ట్ ఇస్తుంది.
+    ఈ ఫంక్షన్ OpenAI కీ అవసరం లేకుండా Groq ద్వారా ఏజెంట్లను నడుపుతుంది.
     """
-    # ఏజెంట్లకు అప్‌గ్రేడ్ చేసిన LLMని కేటాయించడం
+    # ఏజెంట్లకు మాన్యువల్‌గా Groq LLMని కేటాయించడం
     research_agent.llm = smart_llm
     writer_agent.llm = smart_llm
     linkedin_agent.llm = smart_llm
 
-    # టాస్క్‌లను ఇనిషియలైజ్ చేయడం
-    research_task = create_research_task(research_agent, topic)
-    writing_task = create_writing_task(writer_agent)
-    linkedin_task = create_linkedin_task(linkedin_agent)
-
     # Crew అసెంబ్లీ
-    # Sequential process వల్ల ఒక ఏజెంట్ అవుట్‌పుట్ మరొకరికి పర్ఫెక్ట్‌గా అందుతుంది
     crew = Crew(
         agents=[research_agent, writer_agent, linkedin_agent],
-        tasks=[research_task, writing_task, linkedin_task],
+        tasks=[
+            create_research_task(research_agent, topic),
+            create_writing_task(writer_agent),
+            create_linkedin_task(linkedin_agent)
+        ],
         process=Process.sequential,
-        memory=False, # Streamlit stability కోసం ప్రస్తుతానికి False
+        # 🚨 ముఖ్యం: CrewAI OpenAI కోసం వెతకకుండా ఇక్కడ 'embedder'ని సెట్ చేస్తున్నాం
+        # ఒకవేళ మీ దగ్గర Gemini API Key ఉంటే దాన్ని వాడవచ్చు, లేదంటే 'None' చేయవచ్చు.
+        embedder={
+            "provider": "google",
+            "config": {
+                "model": "models/embedding-001",
+                "api_key": os.getenv("GEMINI_API_KEY") or "na"
+            }
+        } if os.getenv("GEMINI_API_KEY") else None,
+        memory=False, 
         verbose=True,
-        cache=True
+        cache=True,
+        # ఇది OpenAI కి వెళ్లకుండా ఆపుతుంది
+        planning=False 
     )
 
     return crew.kickoff()
