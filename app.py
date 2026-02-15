@@ -4,119 +4,142 @@ import requests
 from datetime import datetime
 from dotenv import load_dotenv
 
-# --- LOAD ENVIRONMENT VARIABLES ---
+# --- పర్యావరణ వేరియబుల్స్ లోడ్ చేయడం ---
 load_dotenv()
 
-# --- IMPORT YOUR CREW LOGIC ---
+# --- BACKEND LOGIC IMPORT ---
 try:
     from crew import run_crew 
 except ImportError:
-    st.error("🚨 Neural Bridge Offline. Check crew.py")
+    st.error("🚨 Neural Bridge Offline. Check if 'crew.py' is in the same folder.")
 
-# --- CONFIG ---
-st.set_page_config(page_title="AgentForge Studio", page_icon="⚡", layout="wide")
+# --- PAGE CONFIG ---
+st.set_page_config(
+    page_title="AgentForge Elite | AI Command Center",
+    page_icon="💎",
+    layout="wide",
+)
 
-# --- STYLING (THE VISIONARY LOOK) ---
+# --- MAKE.COM WEBHOOK URL ---
+MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/m4dzevy0jky3h3r86cbrhedvyibjkt8j"
+
+# --- CUSTOM CSS (PREMIUM DARK THEME) ---
 st.markdown("""
     <style>
-    .main { background: #0b0e14; color: #ffffff; }
-    .agent-status {
-        background: rgba(59, 130, 246, 0.1);
-        border: 1px solid #3b82f6;
-        border-radius: 10px;
-        padding: 10px;
+    .main { background: #080a0f; color: #ffffff; }
+    .stApp { background: radial-gradient(circle at 50% 50%, #111827 0%, #080a0f 100%); }
+    
+    /* Neon Status Cards */
+    .agent-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(59, 130, 246, 0.4);
+        border-radius: 12px;
+        padding: 15px;
         text-align: center;
-        font-size: 0.8rem;
+        transition: 0.3s;
     }
+    .agent-card:hover { border-color: #3b82f6; box-shadow: 0 0 15px rgba(59, 130, 246, 0.2); }
+    
+    /* Terminal Style Output */
     .output-container {
-        background: #161b22;
-        border: 1px solid #30363d;
-        border-radius: 12px;
-        padding: 25px;
-        color: #e6edf3;
-        font-family: 'Inter', sans-serif;
-    }
-    .img-placeholder {
-        height: 300px;
-        border: 2px dashed #30363d;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 12px;
         background: #0d1117;
+        border-radius: 10px;
+        padding: 20px;
+        border-left: 5px solid #3b82f6;
+        font-family: 'Inter', sans-serif;
+        line-height: 1.7;
+        color: #e6edf3;
+        white-space: pre-wrap;
+    }
+    
+    /* Premium Button */
+    div.stButton > button {
+        background: linear-gradient(90deg, #1e40af, #3b82f6);
+        color: white; border: none; border-radius: 8px;
+        font-weight: bold; width: 100%; height: 3.5em;
+        text-transform: uppercase; letter-spacing: 1px;
+    }
+    div.stButton > button:hover {
+        transform: scale(1.02);
+        box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
     }
     </style>
     """, unsafe_allow_html=True)
 
-# --- SIDEBAR ---
+# --- SIDEBAR CONTROL PANEL ---
 with st.sidebar:
-    st.title("⚡ CONTROL")
+    st.image("https://cdn-icons-png.flaticon.com/512/2103/2103633.png", width=80)
+    st.title("Elite Control")
     st.markdown("---")
-    st.toggle("High Quality Renders", value=True)
-    st.toggle("Auto-Post to Socials", value=False)
+    st.success("Core: Llama-3.3-70B")
+    st.info("Status: Optimized")
     st.markdown("---")
-    st.info("Engine: Groq Llama-3.3")
+    if st.button("🔄 RESET SESSION"):
+        st.session_state.final_report = None
+        st.rerun()
 
-# --- HEADER ---
-st.markdown("<h1 style='color:#3b82f6;'>AGENTFORGE <span style='color:white;'>VISUAL STUDIO</span></h1>", unsafe_allow_html=True)
-st.markdown("---")
+# --- HEADER SECTION ---
+st.markdown("<h1 style='text-align: center; color: #3b82f6;'>⚡ AGENTFORGE <span style='color:white;'>ELITE</span></h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #94a3b8;'>Advanced Autonomous Intelligence & Content Synthesis</p>", unsafe_allow_html=True)
 
-# --- UI LAYOUT ---
-col_input, col_output = st.columns([1, 1.5], gap="large")
+# --- REAL-TIME AGENT MONITOR ---
+st.markdown("### 📡 Active Neural Agents")
+p1, p2, p3 = st.columns(3)
+p1.markdown('<div class="agent-card"><b>🔍 Researcher (8B)</b><br><span style="color:#10b981">Ready</span></div>', unsafe_allow_html=True)
+p2.markdown('<div class="agent-card"><b>✍️ Architect (70B)</b><br><span style="color:#10b981">Ready</span></div>', unsafe_allow_html=True)
+p3.markdown('<div class="agent-card"><b>📢 Strategist (70B)</b><br><span style="color:#10b981">Ready</span></div>', unsafe_allow_html=True)
 
-with col_input:
-    st.subheader("🖋️ Content Mission")
-    topic = st.text_area("What is the core message?", placeholder="e.g., The rise of AI in Sustainable Energy", height=100)
+st.markdown("<br>", unsafe_allow_html=True)
+
+# --- MAIN WORKSPACE ---
+col_left, col_right = st.columns([1, 1.5], gap="large")
+
+with col_left:
+    st.markdown("### 🖋️ Objective")
+    topic = st.text_area("What is the mission topic?", placeholder="Enter keywords or a full sentence...", height=150)
     
-    # Agent Pulse Monitor
-    st.markdown("#### 📡 Agent Pulse")
-    p1, p2, p3 = st.columns(3)
-    p1.markdown('<div class="agent-status">Researcher<br>● Ready</div>', unsafe_allow_html=True)
-    p2.markdown('<div class="agent-status">Architect<br>● Ready</div>', unsafe_allow_html=True)
-    p3.markdown('<div class="agent-status">Visionary<br>● Ready</div>', unsafe_allow_html=True)
+    st.markdown("#### ⚙️ Settings")
+    tone = st.selectbox("Tone of Voice", ["Professional", "Provocative", "Educational", "Minimalist"])
     
-    st.markdown("<br>", unsafe_allow_html=True)
-    if st.button("🚀 EXECUTE SYNTHESIS"):
-        if topic:
-            with st.status("Agents Interfacing...", expanded=True) as status:
+    if st.button("🚀 INITIATE SWARM"):
+        if not topic:
+            st.warning("Please define a topic before execution.")
+        else:
+            with st.status("🔗 Connecting to Neural Swarm...", expanded=True) as status:
                 try:
+                    # Run the Backend Crew
                     response = run_crew(topic)
+                    # Store result in session state
                     st.session_state.final_report = response.raw if hasattr(response, 'raw') else str(response)
-                    status.update(label="SUCCESS: Intelligence Synthesized", state="complete")
+                    status.update(label="✅ Synthesis Complete!", state="complete", expanded=False)
                 except Exception as e:
-                    st.error(f"Execution Error: {e}")
+                    st.error(f"Execution Error: {str(e)}")
 
-with col_output:
+with col_right:
+    st.markdown("### 📑 Intelligence Feed")
     if 'final_report' in st.session_state and st.session_state.final_report:
-        tab1, tab2 = st.tabs(["📝 Content Report", "🖼️ Visual Studio"])
+        # Display the result in a nice container
+        st.markdown(f'<div class="output-container">{st.session_state.final_report}</div>', unsafe_allow_html=True)
         
-        with tab1:
-            st.markdown(f'<div class="output-container">{st.session_state.final_report}</div>', unsafe_allow_html=True)
-            st.markdown("<br>", unsafe_allow_html=True)
-            
-            c1, c2 = st.columns(2)
-            with c1:
-                st.download_button("💾 Save Report", st.session_state.final_report)
-            with c2:
-                if st.button("📡 Dispatch to LinkedIn"):
-                    st.toast("Transmitting via Webhook...")
-                    # logic: requests.post(MAKE_WEBHOOK_URL, json={"message": st.session_state.final_report})
-
-        with tab2:
-            st.subheader("Visual Asset Generation")
-            st.markdown("Generate a custom high-fidelity image based on your content.")
-            
-            # ఇక్కడ మనం ఒక ఇమేజ్ ప్రాంప్ట్ తయారు చేస్తున్నాం
-            image_prompt = f"Professional 3D render, futuristic style, related to: {topic[:50]}"
-            st.text_input("Generated Prompt", value=image_prompt)
-            
-            if st.button("🎨 GENERATE VISUAL (Nano Banana)"):
-                with st.spinner("Synthesizing Visuals..."):
-                    # Note: ఇక్కడ మనం భవిష్యత్తులో మీ ఇమేజ్ జనరేషన్ API ని కనెక్ట్ చేయవచ్చు
-                    st.markdown('<div class="img-placeholder">Image Generation Engine Connecting...</div>', unsafe_allow_html=True)
-                    st.info("I can help you generate images (quota: 100/day). Would you like me to create a specific image for this content now?")
+        st.markdown("<br>", unsafe_allow_html=True)
+        # Action Buttons
+        d1, d2 = st.columns(2)
+        with d1:
+            st.download_button("📥 DOWNLOAD REPORT", st.session_state.final_report, file_name=f"Intel_{datetime.now().strftime('%Y%m%d')}.txt")
+        with d2:
+            if st.button("📡 DISPATCH TO WEBHOOK"):
+                with st.spinner("Broadcasting..."):
+                    try:
+                        res = requests.post(MAKE_WEBHOOK_URL, json={"content": st.session_state.final_report, "topic": topic})
+                        if res.status_code == 200:
+                            st.success("Successfully Sent to Make.com!")
+                            st.balloons()
+                        else:
+                            st.error("Failed to Dispatch. Check Webhook.")
+                    except Exception as e:
+                        st.error(f"Error: {e}")
     else:
-        st.markdown("<div style='height:400px; display:flex; align-items:center; justify-content:center; border:1px dashed #30363d; border-radius:12px; color:#484f58;'>Awaiting Neural Authorization to begin...</div>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align:center; padding-top:100px; color:#4b5563; border: 1px dashed #30363d; border-radius:12px; height:300px; display:flex; align-items:center; justify-content:center;'>Awaiting Intelligence Input...</div>", unsafe_allow_html=True)
 
 st.markdown("---")
-st.caption("AgentForge v4.5 | Proprietary Neural Orchestration for Veera Babu")
+st.caption(f"© {datetime.now().year} AgentForge Elite v4.5 | Optimized for Veera Babu")
