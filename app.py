@@ -8,12 +8,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # --- IMPORT YOUR CREW LOGIC ---
-# ఇక్కడ ఒక చిన్న మార్పు: నేరుగా run_crew ని ఇంపోర్ట్ చేస్తున్నాం
+# క్రూ లాజిక్ ఇంపోర్ట్ - మనం ఇందాక crew.py లో మార్చిన పేరుతో సింక్ చేశాను
 try:
-    from crew import run_agentic_workflow as run_crew 
+    from crew import run_crew 
 except ImportError:
-    # ఒకవేళ ఫైల్ దొరకకపోతే, క్లియర్ మెసేజ్ చూపిస్తుంది
-    st.error("🚨 Error: 'crew.py' file not found in the current directory.")
+    st.error("🚨 Error: 'crew.py' file not found in the current directory. Please check file names.")
 
 # --- CONFIG & THEME ---
 st.set_page_config(
@@ -43,7 +42,7 @@ st.markdown("""
         padding: 25px; border-radius: 15px;
         border: 1px solid rgba(255, 255, 255, 0.1);
         color: white; line-height: 1.6;
-        white-space: pre-wrap; /* బోల్డ్ యూనికోడ్ సరిగ్గా కనిపించడానికి */
+        white-space: pre-wrap;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -70,8 +69,7 @@ with left_col:
     st.markdown("### 🖋️ Research Parameters")
     topic = st.text_input("Project Objective", placeholder="e.g. Impact of Generative AI on Software Engineering")
     audience = st.selectbox("Target Audience", ["Technical", "Executive", "Creative"])
-    length = st.selectbox("Scope", ["Briefing", "Detailed Report", "Whitepaper"])
-    
+    # Note: audience/length parameters can be passed to run_crew if your function supports them
     generate_btn = st.button("🚀 RUN ORCHESTRATION")
 
 with right_col:
@@ -81,10 +79,10 @@ with right_col:
         else:
             with st.status("📡 Orchestrating Agent Hive...", expanded=True) as status:
                 try:
-                    # Execute CrewAI Logic (From crew.py)
+                    # అప్‌గ్రేడ్ చేసిన crew.py నుండి run_crew ని పిలుస్తున్నాం
                     response = run_crew(topic)
                     
-                    # CrewAI 0.28+ వెర్షన్ల కోసం .raw వాడాలి
+                    # CrewAI అవుట్‌పుట్ నుండి పూర్తి టెక్స్ట్ తీయడం
                     st.session_state.final_report = response.raw if hasattr(response, 'raw') else str(response)
                     
                     status.update(label="✅ Analysis Synthesized", state="complete", expanded=False)
@@ -94,8 +92,8 @@ with right_col:
 
     if st.session_state.final_report:
         st.markdown("### 📑 Intelligence Output")
-        # Unicode Bold అక్షరాలు ప్రొఫెషనల్ గా కనిపించడానికి markdown వాడుతున్నాం
         st.markdown(f'<div class="output-box">', unsafe_allow_html=True)
+        # Markdown లో డిస్ప్లే చేయడం వల్ల బోల్డ్ యూనికోడ్ స్పష్టంగా కనిపిస్తుంది
         st.markdown(st.session_state.final_report)
         st.markdown('</div>', unsafe_allow_html=True)
         
@@ -110,7 +108,7 @@ with right_col:
             if st.button("🚀 PUBLISH TO LINKEDIN"):
                 with st.spinner("Pushing to LinkedIn via Make.com..."):
                     try:
-                        # Unicode Content ని Webhook కి పంపడం
+                        # Webhook పంపేటప్పుడు కూడా Unicode భద్రంగా ఉంటుంది
                         payload = {"message": st.session_state.final_report}
                         res = requests.post(MAKE_WEBHOOK_URL, json=payload)
                         
